@@ -433,7 +433,7 @@ export function getTimeline(roomId, limit = 60) {
   if (!room) return [];
   return room.getLiveTimeline().getEvents()
     .slice(-limit)
-    .filter(e => !e.isRedacted() && ['m.room.message', 'm.room.member'].includes(e.getType()))
+    .filter(e => !e.isRedacted() && ['m.room.message', 'm.room.member', 'm.room.encrypted'].includes(e.getType()))
     .map(formatEvent)
     .filter(Boolean);
 }
@@ -860,6 +860,14 @@ export function formatEvent(event) {
   const ts = event.getTs();
   const id = event.getId();
 
+  if (type === 'm.room.encrypted') {
+    return {
+      type: 'message', eventId: id, sender,
+      body: '🔒 Unable to decrypt message', msgtype: 'm.text',
+      url: null, mentionedUserIds: [], ts, status: event.status, replyTo: null,
+      encrypted: true,
+    };
+  }
   if (type === 'm.room.message') {
     const content = event.getContent();
     const relates = content['m.relates_to'];
