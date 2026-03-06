@@ -102,6 +102,7 @@ export async function addAccount(account, setActive = true) {
     client: setActive ? client : state.client,
   });
 
+  await client.initRustCrypto();
   attachHandlers(client, account.userId);
   await client.startClient({ initialSyncLimit: 30 });
   saveAccounts();

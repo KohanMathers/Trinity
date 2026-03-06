@@ -10,7 +10,8 @@ export default defineConfig({
     }
   },
   optimizeDeps: {
-    include: ['matrix-js-sdk']
+    include: ['matrix-js-sdk'],
+    exclude: ['@matrix-org/matrix-sdk-crypto-wasm'],
   },
   server: {
     port: 5173
