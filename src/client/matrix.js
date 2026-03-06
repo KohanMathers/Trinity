@@ -74,7 +74,14 @@ export async function restoreSessions() {
 export async function addAccount(account, setActive = true) {
   const state = getState();
 
-  if (clients.has(account.userId)) return;
+  if (clients.has(account.userId)) {
+    const existing = clients.get(account.userId);
+    if (!existing.clientRunning) {
+      attachHandlers(existing, account.userId);
+      await existing.startClient({ initialSyncLimit: 30 });
+    }
+    return;
+  }
 
   const client = sdk.createClient({
     baseUrl: account.baseUrl,
@@ -102,7 +109,11 @@ export async function addAccount(account, setActive = true) {
     client: setActive ? client : state.client,
   });
 
-  await client.initRustCrypto();
+  try {
+    await client.initRustCrypto();
+  } catch (err) {
+    console.warn('Crypto init failed, continuing without E2EE:', err);
+  }
   attachHandlers(client, account.userId);
   await client.startClient({ initialSyncLimit: 30 });
   saveAccounts();
