@@ -111,9 +111,19 @@ export async function addAccount(account, setActive = true) {
 
   try {
     await client.initRustCrypto();
+  } catch (err) {
+    if (err?.message?.includes("account in the store doesn't match")) {
+      indexedDB.deleteDatabase('matrix-js-sdk::matrix-sdk-crypto');
+      indexedDB.deleteDatabase('matrix-js-sdk:crypto');
+      window.location.reload();
+      return;
+    }
+    console.error('Crypto init failed, E2EE will not work:', err);
+  }
+  try {
     await client.getCrypto()?.bootstrapCrossSigning({ setupNewCrossSigning: false });
   } catch (err) {
-    console.warn('Crypto init failed, continuing without E2EE:', err);
+    console.error('Cross-signing bootstrap failed:', err);
   }
   attachHandlers(client, account.userId);
   await client.startClient({ initialSyncLimit: 30 });
