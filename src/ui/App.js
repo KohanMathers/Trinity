@@ -3,6 +3,7 @@ import { renderChatArea } from './ChatArea.js';
 import { renderRightPanel } from './RightPanel.js';
 import { initCmdK } from './CmdK.js';
 import { initProfilePopup } from './ProfilePopup.js';
+import { initVerificationModal } from './modals/SASVerificationModal.js';
 
 export function renderApp() {
   try {
@@ -36,6 +37,7 @@ export function renderApp() {
 
   initCmdK();
   initProfilePopup();
+  initVerificationModal();
 
   function openMobileSidebar() {
     sidebar.classList.add('mobile-open');

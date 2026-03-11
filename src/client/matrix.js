@@ -111,6 +111,7 @@ export async function addAccount(account, setActive = true) {
 
   try {
     await client.initRustCrypto();
+    await client.getCrypto()?.bootstrapCrossSigning({ setupNewCrossSigning: false });
   } catch (err) {
     console.warn('Crypto init failed, continuing without E2EE:', err);
   }
@@ -203,6 +204,10 @@ function attachHandlers(client, userId) {
   client.on('RoomMember.membership', (event, member) => {
     emit('membership-changed', { member, roomId: member.roomId });
     emit('rooms-updated', getRoomList());
+  });
+
+  client.on('crypto.verificationRequestReceived', (request) => {
+    emit('verification-request', request);
   });
 }
 
